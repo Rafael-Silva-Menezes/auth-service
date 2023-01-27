@@ -9,10 +9,8 @@ export const configureSwagger = (app: INestApplication) => {
         { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
         'access-token',
       )
-      .setTitle('Voltz Business Banking - API')
-      .setDescription(
-        'BFF utilizado no sistema de internet banking da voltz business',
-      )
+      .setTitle('Auth Service - API')
+      .setDescription('Api to authentication users')
       .setVersion('0.0')
       .build();
     const document = SwaggerModule.createDocument(app, config);
