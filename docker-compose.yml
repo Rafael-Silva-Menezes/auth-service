@@ -1,0 +1,60 @@
+version: '3.9'
+
+services:
+  nest-api:
+    container_name: api
+    env_file: ./.env.local
+    image: node:18-buster
+    ports:
+      - 3000:3000
+    tty: true
+    stdin_open: true
+    extra_hosts: 
+      - "host.docker.internal:172.17.0.1"
+    user: $UID:$GID
+    volumes:
+      - ./:/app
+    working_dir: '/app'
+    networks:
+      - auth-api-default
+
+  mongo-database:
+    container_name: mongo
+    env_file: ./.env.local
+    image: mongo:5.0.3-focal
+    ports:
+      - 27017:27017
+    volumes:
+      - ./docker/mongo:/data/db
+    networks:
+      - auth-api-default
+    #volumes:
+    #- ./db_init_scripts:/docker-entrypoint-initdb.d:rw
+
+  mysql-kc:
+    image: mysql:8.0.27
+    ports:
+      - 3366:3306
+    restart: unless-stopped
+    env_file: ./.env.local
+    volumes:
+      - ./docker/keycloak:/var/lib/mysql
+    networks:
+      - auth-api-default
+
+  keycloak-w:
+    image: jboss/keycloak:16.1.0
+    ports:
+      - 8181:8080
+    restart: unless-stopped
+    env_file: ./.env.local
+    depends_on:
+      - mysql-kc
+    networks:
+      - auth-api-default
+
+networks:
+  auth-api-default:
+
+volumes:
+  keycloak-and-mysql-volume:
